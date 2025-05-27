@@ -129,3 +129,40 @@ def gen_cap():
 
     return caption
 # print(gen_cap())
+
+
+
+
+# ###############################################################
+# import requests
+
+# def check_api():
+#     url = "https://post-creation.onrender.com/"
+#     try:
+#         response = requests.get(url)
+#         if response.status_code == 200:
+#             print("✅ API is live!")
+#             print("Response:", response.text)
+#         else:
+#             print(f"⚠️ API returned status code {response.status_code}")
+#             print("Response:", response.text)
+#     except Exception as e:
+#         print("❌ Failed to reach the API:", str(e))
+
+# def check_caption_endpoint():
+#     url = "https://post-creation.onrender.com/caption"
+#     try:
+#         response = requests.post(url)
+#         if response.status_code == 200:
+#             print("✅ Caption generated successfully!")
+#             print("Caption:", response.json())
+#         else:
+#             print(f"⚠️ Caption endpoint returned status code {response.status_code}")
+#             print("Response:", response.text)
+#     except Exception as e:
+#         print("❌ Failed to reach caption endpoint:", str(e))
+
+# if __name__ == "__main__":
+#     check_api()
+#     check_caption_endpoint()
+

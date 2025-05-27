@@ -2,3 +2,7 @@ requests
 beautifulsoup4
 groq
 python-dotenv
+monsterapi
+fastapi
+uvicorn[standard]
+pydantic

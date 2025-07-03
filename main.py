@@ -1,168 +1,34 @@
-import requests
-import random
-from datetime import datetime
+from firecrawl import FirecrawlApp
 import os
+import numpy as np
+from google import genai
 from dotenv import load_dotenv
-# from monsterapi import client
 
-# Load environment variables from .env file
+
 load_dotenv()
 
-# === API KEYS (stored in .env) ===
-# MONSTER_API_KEY = os.getenv("MONSTER_API_KEY")
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-NEWS_API_KEY = os.getenv("NEWS_API_KEY")
+app = FirecrawlApp(api_key=os.environ.get("firecrawl"))
 
-# Initialize Monster API client
-# monster_client = client(MONSTER_API_KEY)
+links = [
+    {"health": "https://www.thehindu.com/sci-tech/health/"},
+    {"India": "https://www.thehindu.com/news/national/"},
+    {"Enviroment": "https://www.thehindu.com/sci-tech/energy-and-environment/"},
+    {"Science": "https://www.thehindu.com/sci-tech/science/"}
+]
 
-# Topics of interest
-CATEGORIES = ["health", "medical", "environment"]
+def crawl_url(link):
+    
+    scrape_result = app.scrape_url(link, formats=['markdown'])
+    return scrape_result
 
-# Get today's date
-today = datetime.today().strftime('%Y-%m-%d')
-
-# === Fetch News from NewsAPI ===
-def fetch_latest_news(category):
-    url = (
-        f'https://newsapi.org/v2/everything?'
-        f'q={category}&'
-        f'from={today}&'
-        f'sortBy=popularity&'
-        f'apiKey={NEWS_API_KEY}'
+def generate_doctor_post():
+    link_dict = links[np.random.randint(0, len(links))]
+    link_to_crawl = list(link_dict.values())[0]
+    news = crawl_url(link_to_crawl)
+    client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=f"Create a interactive and intresting post for Doctor's audience based on the following scrapped news from the internet:\n{news}\n , choose any one of the news and create a post for Doctor's audience. Keep the post short (max 50-70 words). Use emojis and hashtags if needed.only return the post no other text"
     )
-
-    try:
-        response = requests.get(url)
-        response.raise_for_status()
-        data = response.json()
-        articles = data.get("articles", [])
-        if not articles:
-            return None
-        return random.choice(articles)
-    except Exception as e:
-        print("❌ Error fetching news:", e)
-        return None
-
-# === Generate Caption using Groq API ===
-def generate_caption(prompt, context):
-    headers = {
-        "Authorization": f"Bearer {GROQ_API_KEY}",
-        "Content-Type": "application/json"
-    }
-
-    payload = {
-        "model": "llama-3.3-70b-versatile",
-        "messages": [
-            {"role": "system", "content": context},
-            {"role": "user", "content": prompt}
-        ]
-    }
-
-    try:
-        response = requests.post("https://api.groq.com/openai/v1/chat/completions", headers=headers, json=payload)
-        result = response.json()
-        return result['choices'][0]['message']['content']
-    except Exception as e:
-        print("❌ Error generating caption:", e)
-        return "Unable to generate caption."
-
-# === Generate Image using Monster API ===
-# def generate_image(prompt):
-
-#     model = 'sdxl-base' 
-#     input_data = {
-#     'prompt': prompt,
-#     'negprompt':'blurry, cartoon, unrealistic, fantasy',
-#     'samples': 2,
-#     'enhance': True,
-#     'optimize': True,
-#     'safe_filter': True,
-#     'steps': 50,
-#     'aspect_ratio': 'square',
-#     'guidance_scale': 7.5,
-#     'seed': 2414,
-#     }
-
-#     try:
-#         result = monster_client.generate(model, input_data)
-#         return result['output'][0]  # Return image URL
-#     except Exception as e:
-#         print("❌ Error generating image:", e)
-#         return None
-
-# === Main Execution Flow ===
-def gen_cap():
-    category = random.choice(CATEGORIES)
-    print(f"🔍 Fetching latest '{category}' news for {today}...\n")
-
-    news = fetch_latest_news(category)
-    if not news:
-        print("⚠️ No news found.")
-        return
-
-    print(f"📰 Title: {news['title']}\n")
-
-    caption_prompt = f"""
-    You are a creative Instagram content writer for a doctor. Write an engaging, informative, and emotional Instagram Post for the following news. Use emojis, 2-3 relevant hashtags, and keep it under 200 words.
-
-    Title: {news.get('title', '')}
-    Description: {news.get('description', '')}
-    Link: {news.get('url', '')}
-    """
-    context = "You are an expert social media content creator for a doctor."
-
-    caption = generate_caption(caption_prompt, context)
-
-    print("📝 Instagram Caption:\n")
-    print(caption)
-
-    # image_prompt_request = f"Create a visual prompt for an AI model to generate an Instagram-style image based on this caption:\n\n{caption}"
-    # visual_prompt = generate_caption(image_prompt_request, context)
-
-    # image_url = generate_image(visual_prompt)
-
-    # if image_url:
-    #     print("\n🖼️ Generated Image URL:\n", image_url)
-    # else:
-    #     print("\n⚠️ No image generated.")
-
-    return caption
-# print(gen_cap())
-
-
-
-
-# ###############################################################
-# import requests
-
-# def check_api():
-#     url = "https://post-creation.onrender.com/"
-#     try:
-#         response = requests.get(url)
-#         if response.status_code == 200:
-#             print("✅ API is live!")
-#             print("Response:", response.text)
-#         else:
-#             print(f"⚠️ API returned status code {response.status_code}")
-#             print("Response:", response.text)
-#     except Exception as e:
-#         print("❌ Failed to reach the API:", str(e))
-
-# def check_caption_endpoint():
-#     url = "https://post-creation.onrender.com/caption"
-#     try:
-#         response = requests.post(url)
-#         if response.status_code == 200:
-#             print("✅ Caption generated successfully!")
-#             print("Caption:", response.json())
-#         else:
-#             print(f"⚠️ Caption endpoint returned status code {response.status_code}")
-#             print("Response:", response.text)
-#     except Exception as e:
-#         print("❌ Failed to reach caption endpoint:", str(e))
-
-# if __name__ == "__main__":
-#     check_api()
-#     check_caption_endpoint()
+    return response.text
 

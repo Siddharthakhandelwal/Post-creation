@@ -1,0 +1,7 @@
+firecrawl
+numpy
+google-generativeai
+python-dotenv
+fastapi
+uvicorn
+google-genai

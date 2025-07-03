@@ -1,7 +1,0 @@
-requests
-beautifulsoup4
-groq
-python-dotenv
-fastapi
-uvicorn[standard]
-pydantic==1.10.12

@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import logging
-from main import gen_cap
+from main import generate_doctor_post
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -26,13 +26,10 @@ app.add_middleware(
 async def root():
     return "Doctor Post Agent API"
 
-@app.post("/caption")
-async def generate_caption_only():
+@app.post("/post")
+def generate_post():
     try:
-        cap = gen_cap()
-        return cap
-    except HTTPException:
-        raise
+        post = generate_doctor_post()
+        return {"post": post}
     except Exception as e:
-        logger.error(f"Error generating caption: {str(e)}")
-        raise HTTPException(status_code=500, detail="Failed to generate caption")
+        raise HTTPException(status_code=500, detail=str(e)) 

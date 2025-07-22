@@ -32,7 +32,7 @@ def scrape_environment_issues():
     # Example: Scrape environment news from Google News
     try:
         url = 'https://news.google.com/topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNRFZ4Y0dNU0FtVnVLQUFQAQ?hl=en-US&gl=US&ceid=US:en'
-        resp = requests.get(url, timeout=5)
+        resp = requests.get(url, timeout=5) 
         soup = BeautifulSoup(resp.text, 'html.parser')
         headlines = [a.text for a in soup.find_all('a', {'class': 'DY5T1d'}) if 'environment' in a.text.lower()]
         return headlines[:10]
